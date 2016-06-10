@@ -15,7 +15,10 @@
 	<label for="pw">Password:</label><input id="pw" type="password"><br>
 	<button id="loginButton">Log in</button>
 </form>
-
+<form>
+	<label for="un">JSON Web Token:</label><input id="token" type="text" size="128"><br>
+	<label for="currentUserData">Decoded Token:</label><textarea id="tokenDecoded"></textarea>
+</form>
 <form>
 	<label for="currentUserData">Current user data:</label><textarea id="currentUserData"></textarea>
 	<button id="getCurrentUserData"></button>
@@ -23,7 +26,8 @@
 <script>
 	require(["dojo/request", "dijit/form/Button", "dijit/form/SimpleTextarea", "dojo/dom", "dojo/domReady!"], function(request, Button, SimpleTextarea, dom){
 
-	var token = "";
+	var tokenElem = dom.byId("token");
+	var decodedTokenElem = dom.byId("tokenDecoded");
 
 	var textarea = new SimpleTextarea({
         rows: 5,
@@ -36,7 +40,7 @@
     var button = new Button({
         label: "Get Current User Information",
         onClick: function(){
-            request("/api/users/current", { headers: { "X-AUTH-TOKEN": token }}).then(
+            request("/api/users/current", { headers: { "X-AUTH-TOKEN": tokenElem.value }}).then(
 		        function(text){
 		            textarea.set("value", text);
 		        },
@@ -56,7 +60,8 @@
 			var loginPromise = request.post("/api/login", {data: JSON.stringify({ username: un, password: pw }), handleAs: "json", headers: { "Content-Type": "application/json" } });
             loginPromise.response.then(function(response) {
                 console.log("X-AUTH-TOKEN:" + response.getHeader('X-AUTH-TOKEN'));
-                token = response.getHeader('X-AUTH-TOKEN');
+                tokenElem.value = response.getHeader('X-AUTH-TOKEN');
+                decodedTokenElem.value = atob(response.getHeader('X-AUTH-TOKEN').split('.')[0]);
             },
             function() {
                 console.log("Log in failure");
