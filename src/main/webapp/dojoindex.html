@@ -8,13 +8,14 @@
 <script data-dojo-config="async: 1, dojoBlankHtmlUrl: '/path/to/blank.html'"
         src="//ajax.googleapis.com/ajax/libs/dojo/1.10.4/dojo/dojo.js"></script>
 <h1>Let's play with Dojo</h1>
-<!--
+
 <form>
 	Login as user/user or admin/admin:<br>
 	<label for="un">Username:</label><input id="un" type="text"><br>
 	<label for="pw">Password:</label><input id="pw" type="password"><br>
+	<button id="loginButton">Log in</button>
 </form>
--->
+
 <form>
 	<label for="currentUserData">Current user data:</label><textarea id="currentUserData"></textarea>
 	<button id="getCurrentUserData"></button>
@@ -44,6 +45,18 @@
         }
     }, "getCurrentUserData");
     button.startup();
+
+    var loginButton = new Button({
+        label: "Log in",
+        onClick: function(){
+            //var loginPromise = xhr.post("/api/login", {data: JSON.stringify({ username: "user", password: "user" }), handleAs: "json", headers: { "Content-Type": "application/json" } });
+			var loginPromise = request.post("/api/login", {data: JSON.stringify({ username: "user", password: "user" }), handleAs: "json", headers: { "Content-Type": "application/json" } });
+            loginPromise.response.then(function(response) {
+                console.log("X-AUTH-TOKEN:" + response.getHeader('X-AUTH-TOKEN'));
+            });
+        }
+    }, "loginButton");
+    loginButton.startup();
 });
 </script>
 </body>
