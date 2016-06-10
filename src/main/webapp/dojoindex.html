@@ -2,10 +2,49 @@
 <html>
 <head>
 	<title>Demo</title>
+	<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/dojo/1.10.4/dijit/themes/claro/claro.css">
 </head>
-<body>
+<body class="claro">
 <script data-dojo-config="async: 1, dojoBlankHtmlUrl: '/path/to/blank.html'"
         src="//ajax.googleapis.com/ajax/libs/dojo/1.10.4/dojo/dojo.js"></script>
 <h1>Let's play with Dojo</h1>
+<!--
+<form>
+	Login as user/user or admin/admin:<br>
+	<label for="un">Username:</label><input id="un" type="text"><br>
+	<label for="pw">Password:</label><input id="pw" type="password"><br>
+</form>
+-->
+<form>
+	<label for="currentUserData">Current user data:</label><textarea id="currentUserData"></textarea>
+	<button id="getCurrentUserData"></button>
+</form>
+<script>
+	require(["dojo/request", "dijit/form/Button", "dijit/form/SimpleTextarea", "dojo/domReady!"], function(request, Button, SimpleTextarea){
+
+	var textarea = new SimpleTextarea({
+        rows: 5,
+        cols: 50,
+        value: ""
+    }, "currentUserData");
+    textarea.startup();
+
+
+    var button = new Button({
+        label: "Get Current User Information",
+        onClick: function(){
+            request("/api/users/current").then(
+		        function(text){
+		            textarea.set("value", text);
+		        },
+		        function(error){
+		            console.log("An error occurred: " + error);
+		        }
+		    );
+        }
+    }, "getCurrentUserData");
+    button.startup();
+});
+</script>
 </body>
 </html>
