@@ -21,7 +21,9 @@
 	<button id="getCurrentUserData"></button>
 </form>
 <script>
-	require(["dojo/request", "dijit/form/Button", "dijit/form/SimpleTextarea", "dojo/domReady!"], function(request, Button, SimpleTextarea){
+	require(["dojo/request", "dijit/form/Button", "dijit/form/SimpleTextarea", "dojo/dom", "dojo/domReady!"], function(request, Button, SimpleTextarea, dom){
+
+	var token = "";
 
 	var textarea = new SimpleTextarea({
         rows: 5,
@@ -34,7 +36,7 @@
     var button = new Button({
         label: "Get Current User Information",
         onClick: function(){
-            request("/api/users/current").then(
+            request("/api/users/current", { headers: { "X-AUTH-TOKEN": token }}).then(
 		        function(text){
 		            textarea.set("value", text);
 		        },
@@ -49,10 +51,15 @@
     var loginButton = new Button({
         label: "Log in",
         onClick: function(){
-            //var loginPromise = xhr.post("/api/login", {data: JSON.stringify({ username: "user", password: "user" }), handleAs: "json", headers: { "Content-Type": "application/json" } });
-			var loginPromise = request.post("/api/login", {data: JSON.stringify({ username: "user", password: "user" }), handleAs: "json", headers: { "Content-Type": "application/json" } });
+            un = dom.byId("un").value;
+            pw = dom.byId("pw").value;
+			var loginPromise = request.post("/api/login", {data: JSON.stringify({ username: un, password: pw }), handleAs: "json", headers: { "Content-Type": "application/json" } });
             loginPromise.response.then(function(response) {
                 console.log("X-AUTH-TOKEN:" + response.getHeader('X-AUTH-TOKEN'));
+                token = response.getHeader('X-AUTH-TOKEN');
+            },
+            function() {
+                console.log("Log in failure");
             });
         }
     }, "loginButton");
